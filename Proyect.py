@@ -4,6 +4,7 @@ from PyQt5.QtGui import QIcon, QPixmap, QFontDatabase
 from PyQt5.QtCore import pyqtSlot
 from PyQt5.QtGui import QColor
 from PIL import Image, ImageDraw, ImageFont
+import pygame
 from Proyect_ui import*
 
 class App(Ui_MainWindow, QtWidgets.QMainWindow):
@@ -13,9 +14,11 @@ class App(Ui_MainWindow, QtWidgets.QMainWindow):
         self.pushButtonColor.clicked.connect(self.openColorDialog)
         self.actionNew_2.triggered.connect(self.insertImage)
         self.pushButton_AppendText.clicked.connect(self.WriteOnImage)
+#        print(QFontDatabase.writingSystemName(6))
+#        self.fontComboBox.setWritingSystem(6)
         self.fontComboBox.currentFontChanged.connect(self.changeFont)
         self.textEdit.setText("Write here")
-        self.spinBox.setValue(11)
+        self.spinBox.setValue(11) #Tamaño de letra predeterminado en el textEdit.
         self.spinBox.valueChanged.connect(self.size)
 
     def openColorDialog(self):
@@ -30,11 +33,16 @@ class App(Ui_MainWindow, QtWidgets.QMainWindow):
         self.textEdit.selectAll()
         self.myFont = QtGui.QFont(self.fontComboBox.itemText(self.fontComboBox.currentIndex()))
         self.textEdit.setFont(self.myFont)
-#        self.Font=QtGui.QFontDataBase.systemFont(self.myFont)
+        self.Font = pygame.font.match_font(self.myFont.family())
+        print(self.Font)
+        if self.Font==None:
+            self.Font = "Ubuntu-R.ttf"
+
 #        print(self.Font)
+#        print(self.myFont)
 #        print(self.textEdit.font())
 #        print(self.textEdit.fontFamily())
-#        print(self.myFont)
+#        print(self.myFont.family())
 #        print(self.myFont.toString())
 #        print("")
 
@@ -72,8 +80,7 @@ class App(Ui_MainWindow, QtWidgets.QMainWindow):
     def WriteOnImage(self):
         image = Image.open(self.files)
         draw = ImageDraw.Draw(image)
-        font = ImageFont.truetype("Ubuntu-B.ttf", size=self.spinBox.value())
-#        font = ImageFont.truetype("Tengo que obtener el archivo .ttf del FontComboBox", size=self.spinBox.value())
+        font = ImageFont.truetype(self.Font, size=self.spinBox.value())
         (x, y) = (100, 170)
         text = self.textEdit.toPlainText()
         rgb = (self.color.red(), self.color.green(), self.color.blue())
